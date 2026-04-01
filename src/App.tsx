@@ -58,6 +58,13 @@ export default function App() {
         <div className="header-center">
           <div className="mode-switcher" role="group" aria-label="Game mode">
             <button
+              className={`mode-btn${mode === 'hardened' ? ' active' : ''}`}
+              aria-pressed={mode === 'hardened'}
+              onClick={() => switchMode('hardened')}
+            >
+              Hardened Unlimited
+            </button>
+            <button
               className={`mode-btn${mode === 'unlimited' ? ' active' : ''}`}
               aria-pressed={mode === 'unlimited'}
               onClick={() => switchMode('unlimited')}
@@ -88,7 +95,7 @@ export default function App() {
               <button className="share-btn" onClick={handleShare}>
                 {copied ? '✓ Copied!' : '📋 Share'}
               </button>
-              {mode === 'unlimited' && (
+              {(mode === 'unlimited' || mode === 'hardened') && (
                 <button className="new-game-btn" onClick={newGame}>New Game</button>
               )}
             </div>
@@ -103,13 +110,13 @@ export default function App() {
           />
         )}
 
-        {target && <ClueSection key={target.id} target={target} guessCount={guesses.length} />}
+        {target && <ClueSection key={target.id} target={target} guessCount={guesses.length} mode={mode} />}
 
         {guesses.length > 0 && (
           <div className="guess-history" aria-label="Guess history">
             <ColumnHeaders />
             {guesses.map((record, i) => (
-              <GuessRow key={record.champion.id} record={record} index={i} />
+              <GuessRow key={record.champion.id} record={record} index={i} hardened={mode === 'hardened'} />
             ))}
           </div>
         )}

@@ -57,11 +57,11 @@ export interface GameState {
 }
 
 export function useGame(champions: Champion[]): GameState {
-  const [mode, setMode] = useState<GameMode>('unlimited')
+  const [mode, setMode] = useState<GameMode>('hardened')
   const [target, setTarget] = useState<Champion | null>(null)
   const [guesses, setGuesses] = useState<GuessRecord[]>([])
   const [won, setWon] = useState(false)
-  const [stats, setStats] = useState<GameStats>(() => loadStats('unlimited'))
+  const [stats, setStats] = useState<GameStats>(() => loadStats('hardened'))
 
   const startedRef = useRef(false)
 
@@ -83,6 +83,7 @@ export function useGame(champions: Champion[]): GameState {
         setWon(false)
         saveDailyState({ date: todayUTC(), guesses: [], won: false })
       } else {
+        // both 'unlimited' and 'hardened' use a random target
         setTarget(pickUnlimitedTarget(champList))
         setGuesses([])
         setWon(false)
@@ -96,7 +97,7 @@ export function useGame(champions: Champion[]): GameState {
     if (champions.length === 0 || startedRef.current) return
     startedRef.current = true
     startGame(mode, champions)
-    // startGame is stable ([] deps); mode is always 'unlimited' on first load
+    // startGame is stable ([] deps); mode is always 'hardened' on first load
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [champions])
 
@@ -113,6 +114,7 @@ export function useGame(champions: Champion[]): GameState {
         if (mode === 'daily') {
           saveDailyState({ date: todayUTC(), guesses: next, won: isWin })
         }
+
 
         if (isWin) {
           setWon(true)
@@ -131,9 +133,11 @@ export function useGame(champions: Champion[]): GameState {
 
   const newGame = useCallback(() => {
     if (champions.length === 0) return
-    startGame('unlimited', champions)
-    setMode('unlimited')
-  }, [champions, startGame])
+    // preserve hardened mode; daily doesn't show a New Game button
+    const nextMode = mode === 'hardened' ? 'hardened' : 'unlimited'
+    startGame(nextMode, champions)
+    setMode(nextMode)
+  }, [champions, mode, startGame])
 
   const switchMode = useCallback(
     (newMode: GameMode) => {

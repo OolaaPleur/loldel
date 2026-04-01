@@ -1,17 +1,16 @@
 import { useState } from 'react'
-import type { Champion } from '../types'
+import type { Champion, GameMode } from '../types'
+import championsQuotes from '../data/champions-quotes.json'
 
-type ClueKey = 'splash' | 'ability'
-
-const SPLASH_UNLOCK_AT  = 5
-const ABILITY_UNLOCK_AT = 8
+type ClueKey = 'quote' | 'ability'
 
 interface ClueSectionProps {
   target: Champion
   guessCount: number
+  mode: GameMode
 }
 
-export function ClueSection({ target, guessCount }: ClueSectionProps) {
+export function ClueSection({ target, guessCount, mode }: ClueSectionProps) {
   const [revealed, setRevealed] = useState<Set<ClueKey>>(new Set())
 
   function toggle(key: ClueKey) {
@@ -23,36 +22,37 @@ export function ClueSection({ target, guessCount }: ClueSectionProps) {
     })
   }
 
-  const splashLocked  = guessCount < SPLASH_UNLOCK_AT
-  const abilityLocked = guessCount < ABILITY_UNLOCK_AT
+  const quoteUnlockAt   = mode === 'hardened' ? 15 : 3
+  const abilityUnlockAt = mode === 'hardened' ? 20 : 8
+
+  const quoteLocked   = guessCount < quoteUnlockAt
+  const abilityLocked = guessCount < abilityUnlockAt
+
+  const quote = (championsQuotes as Record<string, string>)[target.id] ?? null
 
   return (
     <div className="clue-section">
       <h3 className="clue-heading">Clues</h3>
       <div className="clue-panels">
 
-        {/* Splash Art */}
+        {/* Quote */}
         <div className="clue-panel">
-          {splashLocked ? (
+          {quoteLocked ? (
             <button className="clue-btn" disabled>
-              🔒 Splash Art · {SPLASH_UNLOCK_AT - guessCount} more
+              🔒 Quote · {quoteUnlockAt - guessCount} more
             </button>
           ) : (
             <button
-              className={`clue-btn${revealed.has('splash') ? ' active' : ''}`}
-              onClick={() => toggle('splash')}
+              className={`clue-btn${revealed.has('quote') ? ' active' : ''}`}
+              onClick={() => toggle('quote')}
             >
-              {revealed.has('splash') ? 'Hide Splash' : '🖼 Splash Art'}
+              {revealed.has('quote') ? 'Hide Quote' : '💬 Quote'}
             </button>
           )}
-          {revealed.has('splash') && (
-            <div className="splash-crop-wrapper">
-              <img
-                className="splash-crop splash-bw"
-                src={target.splashUrl}
-                alt="Splash art clue"
-              />
-            </div>
+          {revealed.has('quote') && (
+            <blockquote className="quote-clue">
+              {quote ?? '—'}
+            </blockquote>
           )}
         </div>
 
@@ -60,7 +60,7 @@ export function ClueSection({ target, guessCount }: ClueSectionProps) {
         <div className="clue-panel">
           {abilityLocked ? (
             <button className="clue-btn" disabled>
-              🔒 Ability (R) · {ABILITY_UNLOCK_AT - guessCount} more
+              🔒 Ability (R) · {abilityUnlockAt - guessCount} more
             </button>
           ) : (
             <button
@@ -77,7 +77,6 @@ export function ClueSection({ target, guessCount }: ClueSectionProps) {
                 src={target.spells.R.imageUrl}
                 alt={target.spells.R.name}
               />
-              <span className="ability-name">{target.spells.R.name}</span>
             </div>
           )}
         </div>

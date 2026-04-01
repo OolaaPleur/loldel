@@ -66,7 +66,7 @@ export interface GuessRecord {
 
 // ─── Game mode ───────────────────────────────────────────────────────────────
 
-export type GameMode = 'unlimited' | 'daily'
+export type GameMode = 'unlimited' | 'daily' | 'hardened'
 
 // ─── Stats ───────────────────────────────────────────────────────────────────
 
