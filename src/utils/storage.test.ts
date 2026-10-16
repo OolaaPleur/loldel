@@ -104,13 +104,18 @@ describe('loadDailyState / saveDailyState', () => {
   })
 
   it('returns state saved for today', () => {
-    const state = { date: todayUTC(), guesses: [], won: false }
+    const state = { date: todayUTC(), guesses: [], won: false, lost: false }
     saveDailyState(state)
     expect(loadDailyState()).toEqual(state)
   })
 
+  it('defaults lost to false for a state saved before the field existed', () => {
+    localStorage.setItem('loldle_daily', JSON.stringify({ date: todayUTC(), guesses: [], won: false }))
+    expect(loadDailyState()?.lost).toBe(false)
+  })
+
   it('returns state with won=true saved for today', () => {
-    const state = { date: todayUTC(), guesses: [], won: true }
+    const state = { date: todayUTC(), guesses: [], won: true, lost: false }
     saveDailyState(state)
     expect(loadDailyState()?.won).toBe(true)
   })

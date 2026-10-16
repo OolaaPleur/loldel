@@ -151,7 +151,17 @@ body { min-height: 100dvh; }
   font-size: 1.1rem;
   font-weight: 600;
 }
-.status-banner.won { background: rgba(76,175,80,0.2); border: 1px solid var(--correct); }
+.status-banner.won  { background: rgba(76,175,80,0.2); border: 1px solid var(--correct); }
+.status-banner.lost { background: rgba(244,67,54,0.2); border: 1px solid var(--incorrect); }
+
+.guess-counter {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
 
 .new-game-btn {
   display: block;
@@ -349,7 +359,8 @@ body { min-height: 100dvh; }
   60%  { transform: scale(1.02); }
   100% { transform: scale(1); opacity: 1; }
 }
-.status-banner.won { animation: banner-in 0.4s ease both; }
+.status-banner.won  { animation: banner-in 0.4s ease both; }
+.status-banner.lost { animation: banner-in 0.4s ease both; }
 
 /* ── Responsive ── */
 @media (max-width: 640px) {

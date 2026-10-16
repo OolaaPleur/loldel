@@ -12,7 +12,7 @@ import { buildShareText } from './utils/share'
 
 export default function App() {
   const { champions, loading, error } = useChampions()
-  const { target, guesses, won, mode, stats, guess, newGame, switchMode } = useGame(champions)
+  const { target, guesses, won, lost, mode, stats, guess, newGame, switchMode } = useGame(champions)
   const [showStats, setShowStats] = useState(false)
   const [copied, setCopied] = useState(false)
   const liveRef = useRef<HTMLDivElement>(null)
@@ -101,13 +101,31 @@ export default function App() {
             </div>
             {mode === 'daily' && <CountdownTimer />}
           </div>
+        ) : lost ? (
+          <div className="status-banner lost" role="status">
+            💀 The answer was <strong>{target?.name}</strong>!
+            <div className="win-actions">
+              <button className="share-btn" onClick={handleShare}>
+                {copied ? '✓ Copied!' : '📋 Share'}
+              </button>
+              {(mode === 'unlimited' || mode === 'hardened') && (
+                <button className="new-game-btn" onClick={newGame}>New Game</button>
+              )}
+            </div>
+            {mode === 'daily' && <CountdownTimer />}
+          </div>
         ) : (
-          <GuessInput
-            champions={champions}
-            guessedIds={guessedIds}
-            onGuess={guess}
-            disabled={false}
-          />
+          <>
+            <div className="guess-counter" aria-live="polite">
+              {guesses.length} / {champions.length}
+            </div>
+            <GuessInput
+              champions={champions}
+              guessedIds={guessedIds}
+              onGuess={guess}
+              disabled={false}
+            />
+          </>
         )}
 
         {target && <ClueSection key={target.id} target={target} guessCount={guesses.length} mode={mode} />}

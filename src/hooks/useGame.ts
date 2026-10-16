@@ -43,12 +43,17 @@ function addWin(stats: GameStats, guessCount: number): GameStats {
   }
 }
 
+function addLoss(stats: GameStats): GameStats {
+  return { ...stats, currentStreak: 0 }
+}
+
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export interface GameState {
   target: Champion | null
   guesses: GuessRecord[]
   won: boolean
+  lost: boolean
   mode: GameMode
   stats: GameStats
   guess: (champion: Champion) => void
@@ -61,6 +66,7 @@ export function useGame(champions: Champion[]): GameState {
   const [target, setTarget] = useState<Champion | null>(null)
   const [guesses, setGuesses] = useState<GuessRecord[]>([])
   const [won, setWon] = useState(false)
+  const [lost, setLost] = useState(false)
   const [stats, setStats] = useState<GameStats>(() => loadStats('hardened'))
 
   const startedRef = useRef(false)
@@ -76,17 +82,20 @@ export function useGame(champions: Champion[]): GameState {
           setTarget(dailyTarget)
           setGuesses(saved.guesses)
           setWon(saved.won)
+          setLost(saved.lost)
           return
         }
         setTarget(dailyTarget)
         setGuesses([])
         setWon(false)
-        saveDailyState({ date: todayUTC(), guesses: [], won: false })
+        setLost(false)
+        saveDailyState({ date: todayUTC(), guesses: [], won: false, lost: false })
       } else {
         // both 'unlimited' and 'hardened' use a random target
         setTarget(pickUnlimitedTarget(champList))
         setGuesses([])
         setWon(false)
+        setLost(false)
       }
     },
     [],
@@ -110,11 +119,11 @@ export function useGame(champions: Champion[]): GameState {
       setGuesses((prev) => {
         const next = [record, ...prev]
         const isWin = champion.id === target.id
+        const isLoss = !isWin && next.length === champions.length - 1
 
         if (mode === 'daily') {
-          saveDailyState({ date: todayUTC(), guesses: next, won: isWin })
+          saveDailyState({ date: todayUTC(), guesses: next, won: isWin, lost: isLoss })
         }
-
 
         if (isWin) {
           setWon(true)
@@ -123,12 +132,19 @@ export function useGame(champions: Champion[]): GameState {
             saveStats(mode, updated)
             return updated
           })
+        } else if (isLoss) {
+          setLost(true)
+          setStats((s) => {
+            const updated = addLoss(s)
+            saveStats(mode, updated)
+            return updated
+          })
         }
 
         return next
       })
     },
-    [target, won, mode],
+    [target, won, mode, champions],
   )
 
   const newGame = useCallback(() => {
@@ -148,5 +164,5 @@ export function useGame(champions: Champion[]): GameState {
     [champions, startGame],
   )
 
-  return { target, guesses, won, mode, stats, guess, newGame, switchMode }
+  return { target, guesses, won, lost, mode, stats, guess, newGame, switchMode }
 }

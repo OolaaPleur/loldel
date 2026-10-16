@@ -36,6 +36,7 @@ export interface DailyState {
   date: string        // "YYYY-MM-DD"
   guesses: GuessRecord[]
   won: boolean
+  lost: boolean
 }
 
 export function todayUTC(): string {
@@ -50,7 +51,7 @@ export function loadDailyState(): DailyState | null {
     if (!raw) return null
     const state = JSON.parse(raw) as DailyState
     if (state.date !== todayUTC()) return null   // stale — new day
-    return state
+    return { ...state, lost: state.lost ?? false }   // saved before `lost` existed
   } catch {
     return null
   }
