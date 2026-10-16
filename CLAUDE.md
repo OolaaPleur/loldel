@@ -15,12 +15,12 @@ LolDel is a League of Legends champion guessing game (Wordle-style). Players gue
 ## Commands
 
 ```bash
-npm run dev        # Dev server → http://localhost:5173
-npm run build      # tsc type-check + Vite build → dist/
-npm run preview    # Preview production build
-npm run lint       # ESLint (max-warnings 0)
-npm test           # Run all tests once
-npm run test:watch # Tests in watch mode
+bun run dev        # Dev server → http://localhost:5173
+bun run build      # tsc type-check + Vite build → dist/
+bun run preview    # Preview production build
+bun run lint       # ESLint (max-warnings 0)
+bun run test       # Run all tests once (not `bun test` — that is Bun's own runner)
+bun run test:watch # Tests in watch mode
 ```
 
 ### Container (Podman/Docker)
@@ -82,7 +82,7 @@ Tests live alongside utils in `src/utils/`. Currently covers:
 - `matching.test.ts` — `matchScalar`, `matchArray`, `matchYear`
 - `storage.test.ts` — localStorage read/write helpers
 
-Run with `npm test`. Tests use Vitest + jsdom (no browser required).
+Run with `bun run test`. Tests use Vitest + jsdom (no browser required).
 
 ## Code Conventions
 

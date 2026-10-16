@@ -18,10 +18,10 @@ Champion data is fetched from [Riot Data Dragon](https://developer.riotgames.com
 ## Local development
 
 ```bash
-npm install
-npm run dev       # http://localhost:5173
-npm test          # vitest unit tests
-npm run build     # production build → dist/
+bun install
+bun run dev       # http://localhost:5173
+bun run test      # vitest unit tests (not `bun test` — that is Bun's own runner)
+bun run build     # production build → dist/
 ```
 
 ## Container build

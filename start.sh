@@ -8,7 +8,7 @@ URL="http://localhost:5173"
 fuser -k 5173/tcp 2>/dev/null || true
 
 cd "$SCRIPT_DIR"
-npm run dev &
+bun run dev &
 DEV_PID=$!
 
 # Wait until the server accepts connections (up to 30s)
